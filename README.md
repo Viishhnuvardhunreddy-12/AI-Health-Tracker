@@ -73,7 +73,6 @@ health tracker/
 4. **Set up environment variables:**
    - Create a `.env` file in the project root with your Google Gemini API key:
      ```env
-     GEMINI_API_KEY=AIzaSyAK0YIK3HSdhF4MyyVZoz_Qe1RcbJ_6hSc
      # Add other secrets as needed
      ```
 
@@ -101,13 +100,7 @@ health tracker/
 
 ---
 
-## SMS Notification (Placeholder)
-- SMS functionality is implemented as a placeholder that logs messages to the console.
-- To enable real SMS notifications, integrate with a service like [Twilio](https://www.twilio.com/):
-  1. Sign up for Twilio and get API credentials.
-  2. Replace the placeholder code in the SMS sending function with Twilio's API calls.
 
----
 
 ## Customization & Extensions
 - **Integrate more vitals:** Add new fields in `forms.py`, update `models.py`, and adjust templates.
@@ -128,7 +121,7 @@ Pull requests are welcome! For major changes, please open an issue first to disc
 ---
 
 ## Contact
-- **Author:** [Your Name]
+- **Author:** VIISHHNU VARDHUN REDDY
 - **Project Maintainer:** [Your Contact Info]
 
 For questions or support, please open an issue or contact the maintainer.
