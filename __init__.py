@@ -33,11 +33,11 @@ def create_app():
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     
     # Configure Gemini API directly in the app initialization
-    gemini_api_key = os.getenv("GEMINI_API_KEY", "AIzaSyAK0YIK3HSdhF4MyyVZoz_Qe1RcbJ_6hSc")
+    gemini_api_key = os.getenv("GEMINI_API_KEY")
     app.config['GEMINI_API_KEY'] = gemini_api_key
     
     # Configure Open Router API - Use the API key from .env file with fallback
-    openrouter_api_key = os.getenv("OPENROUTER_API_KEY", "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")
+    openrouter_api_key = os.getenv("OPENROUTER_API_KEY")
     app.config['OPENROUTER_API_KEY'] = openrouter_api_key
     
     # Initialize SQLAlchemy with the app
