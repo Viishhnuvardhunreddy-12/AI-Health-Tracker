@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block title %}Settings{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-8 mx-auto">
+            <div class="card shadow-sm border-0">
+                <div class="card-header card-header-gradient primary">
+                    <div class="card-header-with-icon">
+                        <div class="card-header-icon primary">
+                            <i class="fas fa-cog"></i>
+                        </div>
+                        <h5 class="mb-0 text-white">Settings</h5>
+                    </div>
+                </div>
+                <div class="card-body p-4">
+                    <form method="POST" action="{{ url_for('main.settings') }}">
+                        {{ form.hidden_tag() }}
+                        <div class="list-group mb-4">
+                            <div class="list-group-item d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="mb-1">{{ form.daily_reminder.label.text }}</h6>
+                                    <p class="mb-0 small text-muted">Receive daily reminders to log your health data</p>
+                                </div>
+                                <div class="form-check form-switch">
+                                    {{ form.daily_reminder(class="form-check-input") }}
+                                </div>
+                            </div>
+                            <div class="list-group-item d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="mb-1">{{ form.goal_achievement.label.text }}</h6>
+                                    <p class="mb-0 small text-muted">Get notified when you reach your health goals</p>
+                                </div>
+                                <div class="form-check form-switch">
+                                    {{ form.goal_achievement(class="form-check-input") }}
+                                </div>
+                            </div>
+                            <div class="list-group-item d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="mb-1">{{ form.health_insights.label.text }}</h6>
+                                    <p class="mb-0 small text-muted">Receive personalized health insights and tips</p>
+                                </div>
+                                <div class="form-check form-switch">
+                                    {{ form.health_insights(class="form-check-input") }}
+                                </div>
+                            </div>
+                            <div class="list-group-item d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="mb-1">{{ form.weekly_reports.label.text }}</h6>
+                                    <p class="mb-0 small text-muted">Get weekly summary reports of your health data</p>
+                                </div>
+                                <div class="form-check form-switch">
+                                    {{ form.weekly_reports(class="form-check-input") }}
+                                </div>
+                            </div>
+                        </div>
+                        {{ form.submit(class="btn btn-primary") }}
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

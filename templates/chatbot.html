@@ -1,0 +1,399 @@
+{% extends 'base.html' %}
+
+{% block title %}Health Chatbot{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card shadow-lg border-0 rounded-lg overflow-hidden">
+                <div class="card-header bg-gradient-primary text-white py-3">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <h3 class="mb-0">
+                            <i class="fas fa-robot me-2"></i>Health Assistant
+                        </h3>
+                        <span class="badge bg-light text-primary px-3 py-2 rounded-pill">AI Powered</span>
+                    </div>
+                </div>
+                
+                <div class="card-body p-0">
+                    <div class="chat-header bg-light p-3 border-bottom">
+                        <div class="d-flex align-items-center">
+                            <div class="chat-avatar bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3">
+                                <i class="fas fa-heartbeat"></i>
+                            </div>
+                            <div>
+                                <h6 class="mb-0 fw-bold">Health AI</h6>
+                                <small class="text-muted">Ask me anything about health, fitness, nutrition, or wellness</small>
+                            </div>
+                            <div class="ms-auto">
+                                <span class="badge bg-success rounded-pill px-2 py-1">
+                                    <i class="fas fa-circle me-1" style="font-size: 8px;"></i>Online
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div id="chat-messages" class="chat-messages p-3">
+                        <!-- Initial welcome message -->
+                        <div class="chat-bot-message">
+                            <div class="message-content">
+                                <p class="mb-0">Hello! I'm your personal health assistant. How can I help you today?</p>
+                            </div>
+                            <div class="message-time">
+                                <small class="text-muted">Just now</small>
+                            </div>
+                        </div>
+                        
+                        <div class="chat-bot-message">
+                            <div class="message-content">
+                                <p class="mb-0">You can ask me questions about:</p>
+                                <ul class="suggestion-chips mt-2">
+                                    <li><button onclick="askSuggestion('How can I improve my sleep?')">Sleep tips</button></li>
+                                    <li><button onclick="askSuggestion('What foods boost immunity?')">Immunity foods</button></li>
+                                    <li><button onclick="askSuggestion('Quick workout ideas')">Quick workouts</button></li>
+                                    <li><button onclick="askSuggestion('Stress management techniques')">Stress management</button></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="chat-input-container p-3 border-top">
+                        <form id="chat-form" class="mb-0">
+                            <div class="input-group">
+                                <input type="text" id="chatbot-question" class="form-control" 
+                                       placeholder="Type your health question here..." aria-label="Your question">
+                                <button class="btn btn-primary px-4" type="submit" id="chatbot-send">
+                                    <i class="fas fa-paper-plane"></i> <span class="d-none d-md-inline ms-1">Send</span>
+                                </button>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center mt-2">
+                                <small class="text-muted"><i class="fas fa-info-circle me-1"></i>Your questions are private and not stored</small>
+                                <button type="button" id="clear-chat" class="btn btn-sm btn-outline-secondary">
+                                    <i class="fas fa-trash-alt me-1"></i>Clear chat
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const chatForm = document.getElementById('chat-form');
+    const chatInput = document.getElementById('chatbot-question');
+    const chatBtn = document.getElementById('chatbot-send');
+    const responseArea = document.getElementById('chat-messages');
+    const clearChatBtn = document.getElementById('clear-chat');
+    
+    // Add event listeners
+    chatForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        sendMessage();
+    });
+    
+    clearChatBtn.addEventListener('click', function() {
+        // Keep only the first two welcome messages
+        const messages = responseArea.querySelectorAll('.chat-bot-message, .chat-user-message');
+        for (let i = 2; i < messages.length; i++) {
+            messages[i].remove();
+        }
+    });
+    
+    // Function to get current time
+    function getCurrentTime() {
+        const now = new Date();
+        return now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    }
+    
+    function appendMessage(html) {
+        responseArea.innerHTML += html;
+        responseArea.scrollTop = responseArea.scrollHeight;
+    }
+    
+    // Function to handle suggestion chips
+    window.askSuggestion = function(question) {
+        chatInput.value = question;
+        sendMessage();
+    };
+    
+    function sendMessage() {
+        // Get user input
+        const originalQuestion = chatInput.value.trim();
+        if (!originalQuestion) return;
+        
+        // Disable input and button while processing
+        chatInput.disabled = true;
+        chatBtn.disabled = true;
+        chatBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>';
+        
+        // Add user message to chat
+        appendMessage(`
+            <div class="chat-user-message">
+                <div class="message-content">
+                    <p class="mb-0">${originalQuestion}</p>
+                </div>
+                <div class="message-time">
+                    <small class="text-muted">${getCurrentTime()}</small>
+                </div>
+            </div>
+        `);
+        
+        // Add thinking indicator
+        appendMessage(`
+            <div class="thinking">
+                <div class="typing-indicator">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+        `);
+        
+        // Clear input field
+        chatInput.value = '';
+        
+        // Make API request with timeout
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
+        
+        fetch('/api/chatbot', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({question: originalQuestion}),
+            signal: controller.signal
+        })
+        .then(response => {
+            clearTimeout(timeoutId);
+            if (!response.ok) {
+                throw new Error(`Network response was not ok: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            // Remove thinking indicator before adding response
+            const thinkingIndicator = responseArea.querySelector('.thinking');
+            if (thinkingIndicator) thinkingIndicator.remove();
+            
+            if (data && data.answer) {
+                let formattedAnswer = data.answer
+                    .replace(/\n\n/g, '<br><br>')
+                    .replace(/\n/g, '<br>')
+                    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                    .replace(/\*(.*?)\*/g, '<em>$1</em>');
+                
+                appendMessage(`
+                    <div class="chat-bot-message">
+                        <div class="message-content">
+                            <p class="mb-0">${formattedAnswer}</p>
+                        </div>
+                        <div class="message-time">
+                            <small class="text-muted">${getCurrentTime()}</small>
+                        </div>
+                    </div>
+                `);
+            } else {
+                throw new Error('Invalid response format');
+            }
+        })
+        .catch(error => {
+            console.error('Error with chatbot request:', error);
+            // Remove thinking indicator
+            const thinkingIndicator = responseArea.querySelector('.thinking');
+            if (thinkingIndicator) thinkingIndicator.remove();
+            
+            let errorMessage = 'Sorry, there was an error processing your request. Please try again.';
+            if (error.name === 'AbortError') {
+                errorMessage = 'The request took too long. Please try again or ask a simpler question.';
+            }
+            
+            appendMessage(`
+                <div class="chat-bot-message error">
+                    <div class="message-content">
+                        <p class="mb-0 text-danger"><i class="fas fa-exclamation-circle me-2"></i>${errorMessage}</p>
+                    </div>
+                    <div class="message-time">
+                        <small class="text-muted">${getCurrentTime()}</small>
+                    </div>
+                </div>
+            `);
+        })
+        .finally(() => {
+            // Re-enable input and button
+            chatInput.disabled = false;
+            chatBtn.disabled = false;
+            chatBtn.innerHTML = '<i class="fas fa-paper-plane"></i> <span class="d-none d-md-inline ms-1">Send</span>';
+            chatInput.focus(); // Set focus back to input
+        });
+    }
+});
+</script>
+
+<style>
+:root {
+    --primary-color: #4361ee;
+    --primary-light: #5f8cff;
+    --primary-gradient: linear-gradient(90deg, #4361ee 0%, #5f8cff 100%);
+    --message-bg: #f0f7ff;
+    --user-message-bg: #4361ee;
+    --user-message-color: white;
+    --bot-message-bg: white;
+    --bot-message-border: #e6f0ff;
+}
+
+.bg-gradient-primary {
+    background: var(--primary-gradient);
+}
+
+.chat-messages {
+    height: 400px;
+    overflow-y: auto;
+    background-color: #f8f9fa;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(0,0,0,0.2) transparent;
+}
+
+.chat-messages::-webkit-scrollbar {
+    width: 6px;
+}
+
+.chat-messages::-webkit-scrollbar-thumb {
+    background-color: rgba(0,0,0,0.2);
+    border-radius: 3px;
+}
+
+.chat-user-message, .chat-bot-message {
+    margin-bottom: 16px;
+    max-width: 85%;
+    position: relative;
+    clear: both;
+}
+
+.chat-user-message {
+    float: right;
+}
+
+.chat-bot-message {
+    float: left;
+}
+
+.chat-user-message .message-content {
+    background: var(--user-message-bg);
+    color: var(--user-message-color);
+    border-radius: 18px 18px 0 18px;
+    padding: 12px 16px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.chat-bot-message .message-content {
+    background: var(--bot-message-bg);
+    border: 1px solid var(--bot-message-border);
+    border-radius: 18px 18px 18px 0;
+    padding: 12px 16px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.message-time {
+    margin-top: 4px;
+    text-align: right;
+}
+
+.chat-user-message .message-time {
+    text-align: right;
+}
+
+.chat-bot-message .message-time {
+    text-align: left;
+}
+
+.chat-input-container {
+    background-color: #fff;
+}
+
+.suggestion-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.suggestion-chips li button {
+    background-color: #e6f0ff;
+    color: var(--primary-color);
+    border: none;
+    border-radius: 16px;
+    padding: 6px 12px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+}
+
+.suggestion-chips li button:hover {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.chat-avatar {
+    width: 40px;
+    height: 40px;
+    font-size: 18px;
+}
+
+/* Typing indicator animation */
+.typing-indicator {
+    display: flex;
+    align-items: center;
+    padding: 10px 16px;
+    background: #f0f7ff;
+    border-radius: 18px;
+}
+
+.typing-indicator span {
+    height: 8px;
+    width: 8px;
+    background: var(--primary-color);
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 5px;
+    opacity: 0.4;
+    animation: typing 1.2s infinite;
+}
+
+.typing-indicator span:nth-child(1) {
+    animation-delay: 0s;
+}
+
+.typing-indicator span:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.typing-indicator span:nth-child(3) {
+    animation-delay: 0.4s;
+    margin-right: 0;
+}
+
+@keyframes typing {
+    0% { opacity: 0.4; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.2); }
+    100% { opacity: 0.4; transform: scale(1); }
+}
+
+/* Clear both to prevent layout issues */
+.chat-messages::after {
+    content: "";
+    display: table;
+    clear: both;
+}
+
+.error .message-content {
+    background-color: #fff2f2 !important;
+    border-color: #ffdddd !important;
+}
+</style>
+{% endblock %}

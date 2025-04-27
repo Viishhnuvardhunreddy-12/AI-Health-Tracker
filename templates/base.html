@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Health Tracker - {% block title %}Home{% endblock %}</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Bootstrap and other styles -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    {% block extra_css %}{% endblock %}
+
+    <!-- Favicon -->
+    <link rel="icon" href="{{ url_for('static', filename='images/health-monitoring.svg') }}">
+
+    <!-- Meta theme color for mobile browsers -->
+    <meta name="theme-color" content="#4361ee">
+    
+    <style>
+        :root {
+            --primary: #4361ee;
+            --secondary: #3f37c9;
+            --success: #2ecc71;
+            --info: #4895ef;
+            --warning: #f72585;
+            --danger: #e74c3c;
+            --light: #f7fafd;
+            --dark: #111827;
+            --bg-light: #f7fafd;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: var(--bg-light);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .navbar-dark {
+            background: linear-gradient(90deg, #4361ee 0%, #3a0ca3 100%) !important;
+        }
+        
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 240px;
+            height: 100vh;
+            background: #3a0ca3;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            z-index: 1000;
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .sidebar-header {
+            padding: 1.2rem 1rem;
+            background: #4361ee;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .sidebar-header h4 {
+            color: white !important;
+        }
+        
+        .sidebar-menu {
+            margin-top: 1.5rem;
+            padding: 0 1rem;
+        }
+        
+        .sidebar-menu a,
+        .sidebar-menu a:visited {
+            color: rgba(255, 255, 255, 0.8) !important;
+            font-weight: 500;
+            font-size: 1.09rem;
+            letter-spacing: 0.03em;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            border-radius: 10px;
+            padding: 0.85rem 1rem;
+            margin-bottom: 0.75rem;
+            border-left: 3px solid transparent;
+        }
+        
+        .sidebar-menu a i {
+            font-size: 1.2rem;
+            margin-right: 12px;
+            transition: all 0.3s ease;
+            width: 24px;
+            text-align: center;
+            color: rgba(255, 255, 255, 0.6);
+        }
+        
+        .sidebar-menu a:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: white !important;
+            transform: translateX(5px);
+            border-left: 3px solid #f72585;
+        }
+        
+        .sidebar-menu a:hover i {
+            color: #f72585;
+            transform: scale(1.1);
+        }
+        
+        .sidebar-menu a.active {
+            background: rgba(255, 255, 255, 0.15);
+            color: white !important;
+            border-left: 3px solid #f72585;
+            font-weight: 600;
+        }
+        
+        .sidebar-menu a.active i {
+            color: #f72585;
+        }
+        
+        .sidebar-footer {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            padding: 1rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(0, 0, 0, 0.2);
+            color: rgb(255, 255, 255);
+        }
+        
+        .sidebar-footer small {
+            color: rgba(255, 255, 255, 0.6);
+        }
+        
+        /* Improve sidebar toggle button */
+        .toggle-sidebar {
+            background: linear-gradient(90deg, #4361ee 0%, #3a0ca3 100%);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 10px rgba(67, 97, 238, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .toggle-sidebar:hover {
+            transform: rotate(90deg);
+        }
+        
+        /* Add this to the existing styles */
+        @media (max-width: 991.98px) {
+            .sidebar.show {
+                box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+            }
+        }
+        
+        /* Add this for a nice animation when menu items are hovered */
+        @keyframes pulse-light {
+            0% { box-shadow: 0 0 0 0 rgba(247, 37, 133, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(247, 37, 133, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(247, 37, 133, 0); }
+        }
+        
+        .sidebar-menu a:hover {
+            animation: pulse-light 1.5s infinite;
+        }
+        
+        /* Add this for the sidebar header */
+        .sidebar-header h4 span {
+            color: white !important;
+        }
+        
+        /* Add this for the sidebar footer */
+        .sidebar-footer small {
+            color: #666666;
+        }
+        
+        .main-content {
+            transition: margin 0.3s ease;
+        }
+        
+        .card {
+            border-radius: 12px;
+            border: none;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+        }
+        
+        .card-header-gradient {
+            padding: 1rem;
+            border-radius: 12px 12px 0 0;
+        }
+        
+        .card-header-gradient.primary {
+            background: linear-gradient(90deg, #4361ee 0%, #5f8cff 100%);
+        }
+        
+        .card-header-gradient.info {
+            background: linear-gradient(90deg, #4895ef 0%, #3a0ca3 100%);
+        }
+        
+        .card-header-gradient.success {
+            background: linear-gradient(90deg, #2ecc71 0%, #1d8348 100%);
+        }
+        
+        .card-header-gradient.warning {
+            background: linear-gradient(90deg, #f72585 0%, #b5179e 100%);
+        }
+        
+        .card-header-gradient.secondary {
+            background: linear-gradient(90deg, #3f37c9 0%, #4895ef 100%);
+        }
+        
+        .card-header-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .rounded-4 {
+            border-radius: 12px !important;
+        }
+        
+        .rounded-top-4 {
+            border-top-left-radius: 12px !important;
+            border-top-right-radius: 12px !important;
+        }
+        
+        .bg-blue-50 {
+            background-color: rgba(67, 97, 238, 0.05);
+        }
+        
+        footer {
+            background: #fff;
+            border-top: 1px solid rgba(0, 0, 0, 0.05);
+            padding: 1.5rem 0;
+            margin-top: auto;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(90deg, #4361ee 0%, #5f8cff 100%);
+            border: none;
+            box-shadow: 0 4px 15px rgba(67, 97, 238, 0.2);
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(90deg, #3a0ca3 0%, #4361ee 100%);
+            box-shadow: 0 4px 20px rgba(67, 97, 238, 0.3);
+        }
+        
+        .stat-card {
+            transition: all 0.3s ease;
+            border-radius: 12px;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
+        }
+        
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+        
+        .heart-rate-icon {
+            background-color: rgba(247, 37, 133, 0.1);
+            color: #f72585;
+        }
+        
+        .sleep-icon {
+            background-color: rgba(67, 97, 238, 0.1);
+            color: #4361ee;
+        }
+        
+        .steps-icon {
+            background-color: rgba(46, 204, 113, 0.1);
+            color: #2ecc71;
+        }
+        
+        .mood-icon {
+            background-color: rgba(241, 196, 15, 0.1);
+            color: #f1c40f;
+        }
+        
+        .stat-title {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+        
+        .alert-item {
+            padding: 1rem;
+            border-radius: 8px;
+            background: rgba(247, 37, 133, 0.1);
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+        }
+        
+        .alert-item i {
+            color: #f72585;
+            font-size: 1.2rem;
+            margin-right: 0.75rem;
+        }
+        
+        .alert-item.success {
+            background: rgba(46, 204, 113, 0.1);
+        }
+        
+        .alert-item.success i {
+            color: #2ecc71;
+        }
+        
+        @media (max-width: 991.98px) {
+            .sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+            }
+            
+            .sidebar.show {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                margin-left: 0 !important;
+            }
+            
+            .toggle-sidebar {
+                display: block !important;
+            }
+        }
+    </style>
+</head>
+<body class="has-sidebar" style="min-height: 100vh;">
+    {% if request.path == '/dashboard' %}
+    <div class="sidebar animate__animated animate__fadeInLeft">
+        <div class="sidebar-header py-3 px-3">
+            <h4 class="mb-0 d-flex align-items-center">
+                <img src="{{ url_for('static', filename='images/health-monitoring.svg') }}" alt="Logo" height="30" class="me-2">
+                <span class="fw-bold">Health Tracker</span>
+            </h4>
+        </div>
+        <ul class="sidebar-menu list-unstyled">
+            <li>
+                <a href="{{ url_for('main.dashboard') }}" class="d-flex align-items-center{{ ' active' if request.path == '/dashboard' else '' }}">
+                    <i class="fas fa-tachometer-alt me-2"></i> Dashboard
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('main.calorie_check') }}" class="d-flex align-items-center{{ ' active' if request.path == '/calorie-check' else '' }}">
+                    <i class="fas fa-utensils me-2"></i> Calorie Check
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('main.settings') }}" class="d-flex align-items-center{{ ' active' if request.path == '/settings' else '' }}">
+                    <i class="fas fa-cog me-2"></i> Settings
+                </a>
+            </li>
+        </ul>
+        <div class="sidebar-footer text-center py-3">
+            <small class="text-muted">&copy; 2025 Health Tracker</small>
+        </div>
+    </div>
+    <div class="main-content" style="margin-left: 240px;">
+    {% else %}
+    <div class="main-content" style="margin-left: 0;">
+    {% endif %}
+        <nav class="navbar navbar-expand-lg navbar-dark shadow-sm">
+            <div class="container-fluid px-3">
+                <a class="navbar-brand d-flex align-items-center" href="{{ url_for('main.index') }}">
+                    <img src="{{ url_for('static', filename='images/health-monitoring.svg') }}" alt="Logo" height="30" class="me-2 d-inline-block align-text-top">
+                    <span class="fw-bold">Health Tracker</span>
+                </a>
+                {% if request.path == '/dashboard' %}
+                <button class="navbar-toggler toggle-sidebar d-lg-none" type="button">
+                    <i class="fas fa-bars"></i>
+                </button>
+                {% endif %}
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav ms-auto align-items-center">
+                        <li class="nav-item">
+                            <a class="nav-link{{ ' active' if request.path == url_for('main.index') else '' }}" href="{{ url_for('main.index') }}">
+                                <i class="fas fa-home me-1"></i> Home
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link{{ ' active' if request.path == url_for('main.dashboard') else '' }}" href="{{ url_for('main.dashboard') }}">
+                                <i class="fas fa-tachometer-alt me-1"></i> Dashboard
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link{{ ' active' if request.path == url_for('main.chatbot_page') else '' }}" href="{{ url_for('main.chatbot_page') }}">
+                                <i class="fas fa-robot me-1"></i> Health Chatbot
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+        <main class="container py-4" style="max-width: 1100px; min-height: 80vh;">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }} alert-dismissible fade show rounded-4 animate__animated animate__fadeIn" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+            {% block content %}{% endblock %}
+        </main>
+        <footer class="footer mt-auto py-3 bg-white">
+            <div class="container text-center">
+                <span class="text-muted">
+                    &copy; 2025 Health Tracker – AI-Powered Health Monitoring. All rights reserved.
+                    <br>
+                    <small>Powered by Viishhnu Reddy</small>
+                </span>
+            </div>
+        </footer>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    {% block extra_js %}{% endblock %}
+    
+    <script>
+        // Sidebar toggle functionality for mobile
+        document.addEventListener('DOMContentLoaded', function() {
+            // Mobile sidebar toggle
+            const toggleSidebarBtn = document.querySelector('.toggle-sidebar');
+            const sidebar = document.querySelector('.sidebar');
+            
+            if (toggleSidebarBtn && sidebar) {
+                toggleSidebarBtn.addEventListener('click', function() {
+                    sidebar.classList.toggle('show');
+                });
+            }
+            
+            // Close sidebar when clicking outside on mobile
+            document.addEventListener('click', function(event) {
+                if (window.innerWidth <= 991.98 && 
+                    sidebar && 
+                    !sidebar.contains(event.target) && 
+                    !toggleSidebarBtn.contains(event.target) &&
+                    sidebar.classList.contains('show')) {
+                    sidebar.classList.remove('show');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,165 @@
+{% extends "base.html" %}
+
+{% block title %}Home{% endblock %}
+
+{% block extra_css %}
+<style>
+    .hero-section {
+        background: linear-gradient(135deg, rgba(240, 245, 255, 0.8) 0%, rgba(225, 235, 255, 0.8) 100%), url("{{ url_for('static', filename='images/health-monitoring.jpg') }}") no-repeat center center;
+        background-size: cover;
+        padding: 6rem 0;
+        border-radius: 15px;
+        margin-top: 2rem;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+        position: relative;
+        overflow: hidden;
+    }
+    .hero-section::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0;
+        width: 100%; height: 100%;
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(3px);
+        z-index: 1;
+    }
+    .hero-content {
+        position: relative;
+        z-index: 2;
+    }
+    .hero-section h1 {
+        font-weight: 700;
+        color: #333;
+        text-shadow: 1px 1px 3px rgba(0,0,0,0.1);
+    }
+    .hero-section .lead {
+        color: #555;
+        font-size: 1.15rem;
+    }
+    .feature-icon {
+        font-size: 1.3rem;
+        transition: transform 0.3s ease;
+    }
+    .feature:hover .feature-icon {
+        transform: scale(1.2) rotate(10deg);
+    }
+    .hero-divider {
+        height: 3px;
+        background: var(--primary-gradient);
+        border-radius: 3px;
+        width: 100px; /* Adjusted width */
+        opacity: 0.7;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        margin: 1.5rem 0; /* Adjusted margin */
+    }
+    .pulse-btn {
+        animation: pulse 2s infinite;
+        box-shadow: 0 5px 15px rgba(67, 97, 238, 0.4);
+    }
+    .pulse-btn:hover {
+        animation-play-state: paused;
+        transform: translateY(-3px);
+    }
+    .image-container {
+        position: relative;
+        display: inline-block;
+    }
+    .image-container img {
+        border-radius: 12px;
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+    }
+    .glow-effect {
+        position: absolute;
+        top: 50%; left: 50%;
+        transform: translate(-50%, -50%);
+        width: 90%; height: 90%;
+        background: radial-gradient(circle, rgba(76, 201, 240, 0.2) 0%, rgba(67, 97, 238, 0.1) 50%, rgba(255, 255, 255, 0) 70%);
+        border-radius: 50%;
+        filter: blur(25px);
+        z-index: -1;
+        opacity: 0.7;
+    }
+    /* Add AOS animations if not already included */
+    /* @import url('https://unpkg.com/aos@2.3.1/dist/aos.css'); */
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="hero-section text-center text-md-start">
+    <div class="container hero-content">
+        <div class="row align-items-center">
+            <div class="col-md-7" data-aos="fade-right">
+                <h1 class="display-4 mb-3">Monitor Your Health with AI</h1>
+                <p class="lead mb-4">Track your vitals, gain personalized insights, and proactively manage your well-being with our intelligent health assistant.</p>
+
+                <div class="hero-divider"></div>
+
+                <div class="features mt-4">
+                    <div class="feature d-flex align-items-center mb-3" data-aos="fade-up" data-aos-delay="100">
+                        <i class="fas fa-chart-line text-primary me-3 feature-icon"></i>
+                        <span>Real-time health tracking & visualization</span>
+                    </div>
+                    <div class="feature d-flex align-items-center mb-3" data-aos="fade-up" data-aos-delay="200">
+                        <i class="fas fa-brain text-success me-3 feature-icon"></i>
+                        <span>AI-powered analysis</span>
+                    </div>
+                    <div class="feature d-flex align-items-center mb-3" data-aos="fade-up" data-aos-delay="300">
+                        <i class="fas fa-bell text-warning me-3 feature-icon"></i>
+                        <span>Instant alerts for health anomalies</span>
+                    </div>
+                    <div class="feature d-flex align-items-center mb-3" data-aos="fade-up" data-aos-delay="400">
+                        <i class="fas fa-user-md text-info me-3 feature-icon"></i>
+                        <span>Personalized health recommendations</span>
+                    </div>
+                </div>
+                <a href="{{ url_for('main.dashboard') }}" class="btn btn-primary btn-lg mt-4 pulse-btn" data-aos="fade-up" data-aos-delay="500">Get Started</a>
+                </a>
+            </div>
+            <div class="col-md-5 text-center d-none d-md-block" data-aos="fade-left" data-aos-delay="200">
+                <div class="image-container">
+<script>
+    // Add refresh functionality for the alerts section
+    document.addEventListener('DOMContentLoaded', function() {
+        const refreshButton = document.querySelector('.refresh-alerts button');
+        if (refreshButton) {
+            refreshButton.addEventListener('click', function() {
+                // Add a spinning animation to the refresh icon
+                const refreshIcon = this.querySelector('i');
+                refreshIcon.classList.add('fa-spin');
+                
+                // Simulate fetching new alerts (replace with actual API call if available)
+                setTimeout(function() {
+                    // Stop the spinning animation
+                    refreshIcon.classList.remove('fa-spin');
+                    
+                    // Refresh the alerts content
+                    const alertsContainer = document.querySelector('.alerts-section-body');
+                    if (alertsContainer) {
+                        // You can replace this with actual data from your backend
+                        const currentDate = new Date();
+                        const formattedDate = currentDate.getFullYear() + '-' + 
+                                             String(currentDate.getMonth() + 1).padStart(2, '0') + '-' + 
+                                             String(currentDate.getDate()).padStart(2, '0');
+                        
+                        // Update the alerts with new data
+                        alertsContainer.innerHTML = `
+                            <div class="alert-item">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                <div>
+                                    <strong>${formattedDate}:</strong> Mood score indicates potential concern: ${Math.floor(Math.random() * 5)}/5
+                                </div>
+                            </div>
+                            <div class="alert-item">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                <div>
+                                    <strong>${formattedDate}:</strong> Step count below daily target: ${Math.floor(Math.random() * 100)} steps
+                                </div>
+                            </div>
+                        `;
+                    }
+                }, 1000);
+            });
+        }
+    });
+</script>
+{% endblock %}

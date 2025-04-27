@@ -1,0 +1,380 @@
+{% extends "base.html" %}
+
+{% block title %}Calorie Check{% endblock %}
+
+{% block extra_css %}
+<style>
+    body, .container { background: #f4f8fb; }
+    .calorie-hero {
+        background: linear-gradient(90deg, #6a82fb 0%, #fc5c7d 100%);
+        color: #fff;
+        border-radius: 18px;
+        padding: 2rem 2.5rem 1.5rem 2.5rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 8px 24px rgba(80,80,160,0.08);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+    }
+    .calorie-hero h2 { font-weight: 700; font-size: 2.2rem; margin-bottom: 0; }
+    .calorie-hero p { font-size: 1.1rem; margin-bottom: 0; }
+    .calorie-hero .fa-utensils { font-size: 2.3rem; margin-right: 1rem; }
+
+    .main-card {
+        background: #fff;
+        border-radius: 18px;
+        box-shadow: 0 4px 24px rgba(80,80,160,0.09);
+        padding: 2.5rem 2rem;
+        margin-bottom: 2rem;
+    }
+    .modern-section-title {
+        font-size: 1.2rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+        color: #6a82fb;
+        letter-spacing: 0.5px;
+    }
+    .food-image-container img {
+        border-radius: 12px;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+        max-height: 170px;
+        object-fit: cover;
+        width: 100%;
+    }
+    .food-list .list-group-item {
+        border: none;
+        background: #f8f9fa;
+        margin-bottom: 0.5rem;
+        border-radius: 8px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 1.07rem;
+    }
+    .cal-badge {
+        background: #fc5c7d;
+        color: #fff;
+        border-radius: 12px;
+        font-size: 0.95rem;
+        padding: 0.3em 0.9em;
+        font-weight: 600;
+    }
+    .nutrition-label {
+        border-radius: 12px;
+        background: #f8f9fa;
+        padding: 1.2rem 1.2rem 1rem 1.2rem;
+        margin-bottom: 1.2rem;
+        font-family: 'Inter', Arial, sans-serif;
+        font-size: 1.08rem;
+    }
+    .nutrition-label .header {
+        border-bottom: 2px solid #6a82fb;
+        margin-bottom: 0.6rem;
+        padding-bottom: 0.3rem;
+        font-weight: 600;
+        font-size: 1.13rem;
+    }
+    .nutrition-label .nutrient {
+        display: flex;
+        justify-content: space-between;
+        border-bottom: 1px solid #e3e6ee;
+        padding: 2px 0;
+    }
+    .nutrition-label .total {
+        font-weight: 700;
+        color: #fc5c7d;
+        border-top: 2px solid #6a82fb;
+        margin-top: 6px;
+        padding-top: 4px;
+    }
+    .macro-bars {
+        margin-top: 1.3rem;
+        margin-bottom: 0.7rem;
+    }
+    .macro-bar {
+        height: 30px;
+        border-radius: 12px;
+        margin-bottom: 1rem;
+        background: #f0f0f0;
+        position: relative;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        overflow: visible; /* Changed from hidden to visible */
+    }
+    .macro-bar-inner {
+        height: 100%;
+        border-radius: 12px;
+        color: #fff;
+        font-size: 0.97rem;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        padding-left: 12px;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+        position: relative;
+        transition: width 0.8s ease-in-out;
+        min-width: 40px; /* Ensure minimum width for very small percentages */
+    }
+    .macro-bar-label {
+        position: absolute;
+        left: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        white-space: nowrap;
+        z-index: 10;
+        font-weight: 600;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+    }
+    .macro-bar-inner::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-image: linear-gradient(
+            45deg,
+            rgba(255, 255, 255, 0.1) 25%,
+            transparent 25%,
+            transparent 50%,
+            rgba(255, 255, 255, 0.1) 50%,
+            rgba(255, 255, 255, 0.1) 75%,
+            transparent 75%,
+            transparent
+        );
+        background-size: 8px 8px;
+        z-index: 1;
+    }
+    .macro-bar.protein { 
+        background: #f0f0f0;
+    }
+    .macro-bar.protein .macro-bar-inner {
+        background: linear-gradient(90deg, #4361ee 0%, #3a0ca3 100%);
+        z-index: 2;
+    }
+    .macro-bar.protein .macro-bar-label {
+        color: #fff;
+    }
+    .macro-bar.fat {
+        background: #f0f0f0;
+    }
+    .macro-bar.fat .macro-bar-inner {
+        background: linear-gradient(90deg, #f72585 0%, #b5179e 100%);
+        z-index: 2;
+    }
+    .macro-bar.fat .macro-bar-label {
+        color: #fff;
+    }
+    .macro-bar.carbs {
+        background: #f0f0f0;
+    }
+    .macro-bar.carbs .macro-bar-inner {
+        background: linear-gradient(90deg, #ffbe0b 0%, #fb8500 100%);
+        z-index: 2;
+    }
+    .macro-bar.carbs .macro-bar-label {
+        color: #333;
+    }
+    .macro-bar:hover .macro-bar-inner {
+        filter: brightness(1.1);
+        box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+    }
+    .macro-bar.protein { background: linear-gradient(90deg, #43cea2 0%, #185a9d 100%); }
+    .macro-bar.fat { background: linear-gradient(90deg, #fc5c7d 0%, #6a82fb 100%); }
+    .macro-bar.carbs { background: linear-gradient(90deg, #f7971e 0%, #ffd200 100%); color: #222; }
+    .health-insights {
+        background: #f8f9fa;
+        border-radius: 12px;
+        padding: 1.3rem 1.2rem;
+        min-height: 180px;
+        font-size: 1.12rem;
+        line-height: 1.8;
+        color: #333;
+        box-shadow: 0 1px 6px rgba(80,80,160,0.06);
+        margin-bottom: 0.8rem;
+        max-height: 400px;
+        overflow-y: auto;
+        word-break: break-word;
+    }
+    .copy-btn {
+        float: right;
+        margin-top: -2.2rem;
+        margin-right: 0.5rem;
+        font-size: 0.98rem;
+        color: #6a82fb;
+        background: #fff;
+        border: 1px solid #e3e6ee;
+        border-radius: 6px;
+        padding: 0.15em 0.7em;
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+    .copy-btn:hover { background: #f4f8fb; }
+    @media (max-width: 991px) {
+        .main-card { padding: 1.2rem 0.5rem; }
+        .calorie-hero { flex-direction: column; padding: 1.2rem 1rem; }
+    }
+    @media (max-width: 767px) {
+        .main-card { padding: 0.7rem 0.2rem; }
+        .calorie-hero { padding: 0.7rem 0.5rem; }
+        .health-insights { font-size: 1.01rem; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-3">
+    <div class="calorie-hero mb-4">
+        <div class="d-flex align-items-center mb-2 mb-md-0">
+            <i class="fas fa-utensils"></i>
+            <h2 class="mb-0">Calorie Check</h2>
+        </div>
+        <p class="ms-md-4 mt-2 mt-md-0">Upload a food image to get instant nutrition facts and health insights powered by AI.</p>
+    </div>
+    <div class="main-card">
+        <form method="POST" enctype="multipart/form-data">
+            <div class="row g-4 align-items-end">
+                <div class="col-lg-4 col-md-6">
+                    <label for="food_image" class="form-label modern-section-title"><i class="fas fa-camera me-2"></i>Upload Food Image</label>
+                    <input type="file" class="form-control mb-2" id="food_image" name="food_image" accept="image/*">
+                    <small class="text-muted">For best results, ensure the food items are clearly visible.</small>
+                </div>
+                <div class="col-lg-2 col-md-6 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary w-100 px-4 py-2"><i class="fas fa-search me-2"></i>Analyze Food</button>
+                </div>
+            </div>
+        </form>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="alert alert-info mt-3">
+                {% for category, message in messages %}
+                    <p>{{ message }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
+        {% endwith %}
+
+        {% if not food_items and raw_api_output %}
+            <div class="alert alert-warning mt-3">
+                <strong>Debug Info:</strong> Raw Gemini API output:<br>
+                <pre style="white-space: pre-wrap; word-break: break-all;">{{ raw_api_output }}</pre>
+            </div>
+        {% endif %}
+
+        {% if food_items %}
+        <div class="row g-4 mt-2">
+            <!-- Food Image and Items Column -->
+            <div class="col-lg-4 col-md-5">
+                {% if image_path %}
+                <div class="food-image-container mb-3" style="background:#f8f9fa; border-radius:12px; box-shadow:0 2px 12px rgba(0,0,0,0.07); display:flex; align-items:center; justify-content:center; min-height:140px; min-width:140px; max-width:100%;">
+                    <img src="/{{ image_path }}" class="img-fluid" alt="Food Image" style="max-height:160px; max-width:100%; object-fit:contain; display:block; margin:auto;">
+                </div>
+                {% endif %}
+                <div class="modern-section-title"><i class="fas fa-list-ul me-2 text-primary"></i>Detected Food Items</div>
+                <div class="food-list">
+                    <div class="list-group">
+                        {% for item in food_items %}
+                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                            <span>{{ item|title }}</span>
+                            <span class="cal-badge">
+                                {% set found = false %}
+                                {% for data in nutrition_data %}
+                                    {% if not found and (data.food_item.lower() in item.lower() or item.lower() in data.food_item.lower()) %}
+                                        {{ data.calories }} kcal
+                                        {% set found = true %}
+                                    {% endif %}
+                                {% endfor %}
+                            </span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            <!-- Nutrition Facts Column -->
+            <div class="col-lg-4 col-md-4">
+                <div class="modern-section-title"><i class="fas fa-chart-pie me-2 text-primary"></i>Nutrition Facts</div>
+                <div class="nutrition-label">
+                    <div class="header">Nutrition Facts <span class="small">(per meal)</span></div>
+                    <div class="nutrient"><span>Calories</span><span>{{ total_nutrition.calories|round|int }} kcal</span></div>
+                    <div class="nutrient"><span>Total Fat</span><span>{{ total_nutrition.fat|round|int }}g</span></div>
+                    <div class="nutrient"><span>Total Carbs</span><span>{{ total_nutrition.carbohydrates|round|int }}g</span></div>
+                    <div class="nutrient"><span>Fiber</span><span>{{ total_nutrition.fiber|round|int }}g</span></div>
+                    <div class="nutrient"><span>Sugars</span><span>{{ total_nutrition.sugar|round|int }}g</span></div>
+                    <div class="nutrient"><span>Protein</span><span>{{ total_nutrition.protein|round|int }}g</span></div>
+                    <div class="total"><span>Total Calories</span><span>{{ total_nutrition.calories|round|int }} kcal</span></div>
+                </div>
+                <!-- Macronutrient Breakdown -->
+                <div class="macro-bars">
+                    {% set total_macros = total_nutrition.protein + total_nutrition.fat + total_nutrition.carbohydrates %}
+                    {% if total_macros > 0 %}
+                        {% set protein_percent = (total_nutrition.protein / total_macros * 100)|round|int %}
+                        {% set fat_percent = (total_nutrition.fat / total_macros * 100)|round|int %}
+                        {% set carbs_percent = (total_nutrition.carbohydrates / total_macros * 100)|round|int %}
+                        <div class="macro-bar protein">
+                            <span class="macro-bar-label">Protein {{ protein_percent }}%</span>
+                            <div class="macro-bar-inner" style="width: {{ protein_percent }}%"></div>
+                        </div>
+                        <div class="macro-bar fat">
+                            <span class="macro-bar-label">Fat {{ fat_percent }}%</span>
+                            <div class="macro-bar-inner" style="width: {{ fat_percent }}%"></div>
+                        </div>
+                        <div class="macro-bar carbs">
+                            <span class="macro-bar-label">Carbs {{ carbs_percent }}%</span>
+                            <div class="macro-bar-inner" style="width: {{ carbs_percent }}%"></div>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-info small">No macronutrient data available for these items.</div>
+                    {% endif %}
+                </div>
+            </div>
+            <!-- Health Insights Column -->
+            <div class="col-lg-4 col-md-5">
+                <div class="modern-section-title"><i class="fas fa-lightbulb me-2 text-primary"></i>Health Insights</div>
+                <div class="health-insights">
+                    {% if food_insights %}
+                        {{ food_insights|safe }}
+                    {% else %}
+                        <span class="text-muted">Upload a food image or enter food items to get health insights.</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <!-- Detailed Nutrition Table -->
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="modern-section-title"><i class="fas fa-table me-2 text-primary"></i>Detailed Nutrition Breakdown</div>
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Food Item</th>
+                                <th>Calories</th>
+                                <th>Protein (g)</th>
+                                <th>Fat (g)</th>
+                                <th>Carbs (g)</th>
+                                <th>Fiber (g)</th>
+                                <th>Sugar (g)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for data in nutrition_data %}
+                            <tr>
+                                <td>{{ data.food_item|title }}</td>
+                                <td>{{ data.calories|round|int }} kcal</td>
+                                <td>{{ data.protein|round|int }}</td>
+                                <td>{{ data.fat|round|int }}</td>
+                                <td>{{ data.carbohydrates|round|int }}</td>
+                                <td>{{ data.fiber|round|int }}</td>
+                                <td>{{ data.sugar|round|int }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
