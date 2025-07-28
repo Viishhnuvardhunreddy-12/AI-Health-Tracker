@@ -115,17 +115,11 @@ Pull requests are welcome! For major changes, please open an issue first to disc
 
 ---
 
-## License
-[MIT](LICENSE)
-
----
-
 ## Contact
 - **Author:** VIISHHNU VARDHUN REDDY
-- **Project Maintainer:** [Your Contact Info]
 
 For questions or support, please open an issue or contact the maintainer.
 
 ---
 
-*Last updated: April 27, 2025*
+*Last updated: May 27, 2025*
